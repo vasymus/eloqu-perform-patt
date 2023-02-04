@@ -18,7 +18,7 @@ class UsersController extends Controller
 
             ->withLastLogin() // very good solution, because also upload dynamic relationship // can't lazy load dynamic relationship
 
-            ->search(request('search'))
+            ->search2(request('search'))
 
             ->paginate();
 

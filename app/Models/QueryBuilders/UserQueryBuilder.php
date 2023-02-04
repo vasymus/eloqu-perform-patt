@@ -5,6 +5,7 @@ namespace App\Models\QueryBuilders;
 use App\Models\Company;
 use App\Models\Login;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class UserQueryBuilder extends Builder
 {
@@ -50,7 +51,7 @@ class UserQueryBuilder extends Builder
         collect(
             // explode(' ', $terms)
             str_getcsv($terms, ' ', '"') // bill gates "micr corp" --> ['bill', 'gates', 'micr corp']
-        )->filter()->each(function ($term) {
+        )->filter()->each(function (string $term) {
 
 //            $term = '%'.$term.'%';
 
@@ -60,13 +61,14 @@ class UserQueryBuilder extends Builder
                 $query
                     ->where('first_name', 'like', $term)
                     ->orWhere('last_name', 'like', $term)
+
 //                    ->orWhereHas('company', function ($query) use ($term) {
 //                        $query->where('name', 'like', $term);
 //                    })
 
-//                    ->orWhere('companies.name', 'like', $term)
+//                    ->orWhere('companies.name', 'like', $term) // if has join -- see above
 
-//                    ->orWhereIn('company_id', function(\Illuminate\Database\Query\Builder $query) use($term) {
+//                    ->orWhereIn('company_id', function(QueryBuilder $query) use($term) {
 //                        $query
 //                            ->select('id')
 //                            ->from('companies')
@@ -75,6 +77,33 @@ class UserQueryBuilder extends Builder
 
                     ->orWhereIn('company_id', Company::query()->where('name', 'like', $term)->pluck('id')) // the fastest way
                 ;
+            });
+        });
+
+        return $this;
+    }
+
+    public function search2(string $terms = null)
+    {
+        collect(str_getcsv($terms, ' ', '"'))->filter()->each(function(string $term) {
+            $term = $term.'%';
+
+            $this->whereIn('id', function(QueryBuilder $query) use($term) {
+                $query->select('id')
+                    ->from(function(QueryBuilder $query) use($term) {
+                        $query
+                            ->select('id')
+                            ->from('users')
+                            ->where('first_name', 'like', $term)
+                            ->orWhere('last_name', 'like', $term)
+                            ->union(
+                                $query->newQuery()
+                                    ->select('users.id')
+                                    ->from('users')
+                                    ->join('companies', 'companies.id', '=', 'users.company_id')
+                                    ->where('companies.name', 'like', $term)
+                            );
+                    }, 'matches');
             });
         });
 
