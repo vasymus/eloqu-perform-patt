@@ -35,11 +35,11 @@ services:
             sh -c 'echo "$$UPLOAD_INI_SETTINGS" > /usr/local/etc/php/conf.d/upload_large_dumps.ini
             && php -S "[::]:8080" -t "/var/www/html"'
 
-    ### Database ###
+    ### DB (MariaDB) ###
     db:
-        image: mysql:5.7.12
+        image: mariadb:10.7.7
         volumes:
-            - mysql-ttt-db-data:/var/lib/mysql
+            - mariadb-ttt-db-data:/var/lib/mysql
         environment:
             # MYSQL_ROOT_PASSWORD is the only required
             - MYSQL_ROOT_PASSWORD=root
@@ -69,15 +69,19 @@ services:
                 #
                 # For explanations see
                 # https://mariadb.com/kb/en/configuring-mariadb-with-option-files/
-                default_time_zone='+00:00'
-                sql-mode=''
+                default_time_zone='UTC'
         # didn't want to add any bind mount or additional Dockerfile
         command:
             bash -c 'echo "$$MYSQL_INIT_SCRIPT" > /docker-entrypoint-initdb.d/init.sql
             && chmod 555 /docker-entrypoint-initdb.d/init.sql
             && echo "$$MYSQL_CONFIG" > /etc/mysql/conf.d/my.cnf
             && chmod 555 /etc/mysql/conf.d/my.cnf
-            && docker-entrypoint.sh mysqld --ignore-db-dir=lost+found'
+            && docker-entrypoint.sh mysqld'
+        healthcheck:
+            test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+            interval: 10s
+            timeout: 20s
+            retries: 10
 
 volumes:
-    mysql-ttt-db-data:
+    mariadb-ttt-db-data:

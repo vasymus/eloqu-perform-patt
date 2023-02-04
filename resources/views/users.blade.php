@@ -72,8 +72,8 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                                     @if(true)
-                                    {{ $user->lastLogin->created_at->diffForHumans() }}
-                                    <span class="text-xs text-gray-400">({{ $user->lastLogin->ip_address }})</span>
+                                    {{ optional($user->lastLogin->created_at ?? null)->diffForHumans() }}
+                                    <span class="text-xs text-gray-400">({{ $user->lastLogin->ip_address ?? null }})</span>
                                     @endif
 
                                     @if(false)
