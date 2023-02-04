@@ -1,0 +1,83 @@
+version: '3.9'
+
+services:
+    ### APP (php-fpm) ###
+    app:
+        build:
+            context: .
+            dockerfile: docker/app/Dockerfile
+            target: dev
+        volumes:
+            # used delegated mode here on docker for mac for faster disk I/O
+            - .:/var/www/html:delegated
+        entrypoint: /usr/local/bin/docker-php-entrypoint-dev
+        command: [ "/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf" ]
+        ports:
+            - "${DOCKER_APP_PORT:-9999}:80"
+
+    ### Adminer ###
+    adminer:
+        image: adminer:4.8.0-standalone
+        environment:
+            - ADMINER_DESIGN=flat
+            - ADM_DEFAULT_SERVER=db
+            - ADMINER_PLUGINS=
+            - |
+                UPLOAD_INI_SETTINGS=
+                upload_max_filesize = 500M
+                post_max_size = 500M
+                memory_limit = -1
+                max_execution_time = 0
+        user: root
+        ports:
+          - "8080:8080"
+        command:
+            sh -c 'echo "$$UPLOAD_INI_SETTINGS" > /usr/local/etc/php/conf.d/upload_large_dumps.ini
+            && php -S "[::]:8080" -t "/var/www/html"'
+
+    ### Database ###
+    db:
+        image: mysql:5.7.12
+        volumes:
+            - mysql-ttt-db-data:/var/lib/mysql
+        environment:
+            # MYSQL_ROOT_PASSWORD is the only required
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_USER=${DOCKER_MYSQL_USER:-default}
+            - MYSQL_PASSWORD=${DOCKER_MYSQL_PASSWORD:-secret}
+            - MYSQL_DATABASE=${DOCKER_MYSQL_DATABASE:-laravel}
+            # didn't want to add any bind mount or additional Dockerfile, so put it to env variable
+            # $$ is used for escaping from docker-compose @see https://docs.docker.com/compose/environment-variables/#substitute-environment-variables-in-compose-files
+            # Init script will be run ONLY on first initialization
+            - |
+                MYSQL_INIT_SCRIPT=
+                ## main database ##
+                CREATE DATABASE IF NOT EXISTS `${DOCKER_MYSQL_DATABASE:-laravel}` COLLATE 'utf8mb4_unicode_ci' ;
+                GRANT ALL ON `${DOCKER_MYSQL_DATABASE:-laravel}`.* TO '${DOCKER_MYSQL_USER:-default}'@'%' ;
+
+                ## test database ##
+                CREATE DATABASE IF NOT EXISTS `${DOCKER_MYSQL_DATABASE:-laravel}_test` COLLATE 'utf8mb4_unicode_ci' ;
+                GRANT ALL ON `${DOCKER_MYSQL_DATABASE:-laravel}_test`.* TO '${DOCKER_MYSQL_USER:-default}'@'%' ;
+
+                FLUSH PRIVILEGES ;
+            - |
+                MYSQL_CONFIG=
+                [mysqld]
+                # MariaDB database server configuration file.
+                #
+                # You can use this file to overwrite the default configuration
+                #
+                # For explanations see
+                # https://mariadb.com/kb/en/configuring-mariadb-with-option-files/
+                default_time_zone='+00:00'
+                sql-mode=''
+        # didn't want to add any bind mount or additional Dockerfile
+        command:
+            bash -c 'echo "$$MYSQL_INIT_SCRIPT" > /docker-entrypoint-initdb.d/init.sql
+            && chmod 555 /docker-entrypoint-initdb.d/init.sql
+            && echo "$$MYSQL_CONFIG" > /etc/mysql/conf.d/my.cnf
+            && chmod 555 /etc/mysql/conf.d/my.cnf
+            && docker-entrypoint.sh mysqld --ignore-db-dir=lost+found'
+
+volumes:
+    mysql-ttt-db-data:
