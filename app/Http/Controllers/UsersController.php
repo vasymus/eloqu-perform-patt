@@ -24,4 +24,17 @@ class UsersController extends Controller
 
         return view('users', ['users' => $users]);
     }
+
+    public function index2()
+    {
+        $users = User::query()
+            // slower without compound indexes, because ordering like this not use indexes, created separately on last_name / first_name
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+
+            ->with('company')
+            ->paginate();
+
+        return view('users', ['users' => $users]);
+    }
 }

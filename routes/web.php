@@ -23,6 +23,8 @@ Route::get('/---test', function() {
 
 Route::get('/', [UsersController::class, 'index']);
 
+Route::get('/users2', [UsersController::class, 'index2']);
+
 Route::get('/posts', [PostsController::class, 'index']);
 
 Route::get('/features', [FeaturesController::class, 'index']);
