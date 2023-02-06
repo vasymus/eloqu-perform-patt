@@ -19,6 +19,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property int|null $gender
  * @property string|null $photo
  * @property string $email
+ * @property boolean $is_owner
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property string $password
  * @property string|null $remember_token
@@ -46,6 +47,9 @@ use Laravel\Sanctum\HasApiTokens;
  * @see \App\Models\QueryBuilders\UserQueryBuilder::withLastLogin()
  * @see \App\Models\User::lastLogin()
  * @property \App\Models\Login|null $lastLogin
+ *
+ * @see \App\Models\User::customers()
+ * @property \App\Models\Customer[]|\Illuminate\Database\Eloquent\Collection $customers
  *
  * @method static \App\Models\QueryBuilders\UserQueryBuilder query()
  */
@@ -91,6 +95,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_owner' => 'boolean',
     ];
 
     public function getNameAttribute(): string
@@ -124,6 +129,11 @@ class User extends Authenticatable
     public function lastLogin()
     {
         return $this->belongsTo(Login::class, 'last_login_id', 'id');
+    }
+
+    public function customers()
+    {
+        return $this->hasMany(Customer::class, 'sales_rep_id');
     }
 
     /**

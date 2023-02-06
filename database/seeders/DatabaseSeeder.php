@@ -9,6 +9,7 @@ use App\Models\Feature;
 use App\Models\User;
 use Database\Factories\CommentFactory;
 use Database\Factories\CompanyFactory;
+use Database\Factories\CustomerFactory;
 use Database\Factories\FeatureFactory;
 use Database\Factories\LoginFactory;
 use Database\Factories\PostFactory;
@@ -54,9 +55,24 @@ class DatabaseSeeder extends Seeder
             ->take(10000)
             ->get()
             ->each(
-                fn(User $user) => $user->logins()->createMany(
-                    LoginFactory::new()->count(5)->make()->toArray()
-                )
+                fn(User $user) => $user
+                    ->logins()
+                    ->createMany(
+                        LoginFactory::new()->count(5)->make()->toArray()
+                    )
+            );
+
+        // seed customers
+        User::query()
+            ->inRandomOrder()
+            ->take(10000)
+            ->get()
+            ->each(
+                fn(User $user) => $user
+                    ->customers()
+                    ->createMany(
+                        CustomerFactory::new()->count(5)->make()->toArray()
+                    )
             );
 
         // seed features and comments
@@ -96,5 +112,35 @@ class DatabaseSeeder extends Seeder
         $user->company->update([
             'name' => 'O\'Reilly Media Inc.',
         ]);
+
+        $user1 = UserFactory::new()
+            ->create([
+                'first_name' => 'Ted',
+                'last_name' => 'Bossman',
+                'is_owner' => true,
+                'gender' => 0,
+                'company_id' => Company::query()->inRandomOrder()->first()->id,
+            ]);
+        $user2 = UserFactory::new()
+            ->create([
+                'first_name' => 'Sarah',
+                'last_name' => 'Seller',
+                'gender' => 1,
+                'company_id' => Company::query()->inRandomOrder()->first()->id,
+            ]);
+        $user3 = UserFactory::new()
+            ->create([
+                'first_name' => 'Chase',
+                'last_name' => 'Indeals',
+                'gender' => 0,
+                'company_id' => Company::query()->inRandomOrder()->first()->id,
+            ]);
+
+        foreach ([$user1, $user2, $user3] as $us) {
+            $us->customers()
+                ->createMany(
+                    CustomerFactory::new()->count(25)->make()->toArray()
+                );
+        }
     }
 }
