@@ -116,4 +116,15 @@ class UserQueryBuilder extends Builder
 
         return $this;
     }
+
+    public function orderByLastLogin()
+    {
+        return $this->orderByDesc(
+            Login::query()
+                ->select('created_at')
+                ->whereColumn('user_id', 'users.id')
+                ->latest()
+                ->take(1)
+        );
+    }
 }
