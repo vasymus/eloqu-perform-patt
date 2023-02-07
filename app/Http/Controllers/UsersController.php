@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\User;
 
 class UsersController extends Controller
@@ -32,6 +33,29 @@ class UsersController extends Controller
             ->orderBy('last_name')
             ->orderBy('first_name')
 
+            ->with('company')
+            ->paginate();
+
+        return view('users', ['users' => $users]);
+    }
+
+    public function index3()
+    {
+        // ordering by belongs-to / has-one relationship
+
+        $users = User::query()
+            ->select('users.*')
+
+            ->join('companies', 'companies.id', '=', 'users.company_id')
+            ->orderBy('companies.name')
+
+            // order by subquery is much slower
+//            ->orderBy(
+//                Company::query()->select('name')
+//                    ->whereColumn('id', 'users.company_id')
+//                    ->orderBy('name')
+//                    ->take(1)
+//            )
             ->with('company')
             ->paginate();
 
