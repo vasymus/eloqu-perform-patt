@@ -30,6 +30,8 @@ Route::get('/users3', [UsersController::class, 'index3']);
 
 Route::get('/users4', [UsersController::class, 'index4']);
 
+Route::get('/users5', [UsersController::class, 'index5'])->name('users5');
+
 Route::get('/posts', [PostsController::class, 'index']);
 
 Route::get('/features', [FeaturesController::class, 'index']);
@@ -39,3 +41,5 @@ Route::get('/features/{feature}', [FeaturesController::class, 'show']);
 Route::get('/customers', [CustomersController::class, 'index']);
 
 Route::get('/books', [BooksController::class, 'index']);
+
+Route::get('/books2', [BooksController::class, 'index2']);

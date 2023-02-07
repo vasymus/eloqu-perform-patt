@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Models\QueryBuilders\UserQueryBuilder;
 use App\Models\User;
+use Illuminate\Database\Query\Builder;
 
 class UsersController extends Controller
 {
@@ -80,6 +82,24 @@ class UsersController extends Controller
             ->orderByLastLogin() // ordering by belongs-to relations
 
             ->withLastLogin() // very good solution, because also upload dynamic relationship // can't lazy load dynamic relationship
+            ->paginate();
+
+        return view('users', ['users' => $users]);
+    }
+
+    public function index5()
+    {
+        $users = User::query()
+            ->with('company')
+            ->when(request('sort') === 'town', function (UserQueryBuilder $query) {
+                $query->orderByNullsLast('town', request('direction'));
+
+//                $query
+//                    ->orderByRaw('town is null')
+//                    ->orderBy('town', request('direction'));
+
+            })
+            ->orderBy('last_name')
             ->paginate();
 
         return view('users', ['users' => $users]);

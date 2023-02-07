@@ -33,6 +33,12 @@
                                 Name
                             </th>
                             <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                Author
+                            </th>
+                            <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                Availability
+                            </th>
+                            <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                 Last Checkout
                             </th>
                             <th class="px-6 py-3 border-b border-gray-200 bg-gray-50"></th>
@@ -43,12 +49,27 @@
                             <tr class="bg-white">
                                 <td class="px-6 py-4 border-b border-gray-200 text-sm leading-5">
                                     <div class="font-medium text-gray-900">{{ $book->name }}</div>
-                                    <div class="text-gray-500">{{ $book->author }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                                    {{ $book->author }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                                    @if ($book->user)
+                                        <div
+                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
+                                            Borrowed by {{ $book->user->name }}
+                                        </div>
+                                    @else
+                                        <span
+                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            Available
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5">
-                                    <div class=" text-gray-900">{{ $book->lastCheckout->user->name }}</div>
+                                    <div class=" text-gray-900">{{ $book->lastCheckout->user->name ?? null }}</div>
                                     <div
-                                        class="text-gray-500">{{ $book->lastCheckout->borrowed_date->diffForHumans() }}</div>
+                                        class="text-gray-500">{{ optional($book->lastCheckout->borrowed_date ?? null)->diffForHumans() }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-right border-b border-gray-200 text-sm leading-5 font-medium">
                                     <a href="#"

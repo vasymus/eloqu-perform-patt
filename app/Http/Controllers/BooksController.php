@@ -54,4 +54,16 @@ class BooksController extends Controller
 
         return view('books', ['books' => $books]);
     }
+
+    public function index2()
+    {
+        $books = Book::query()
+            ->with('user')
+            ->orderByDesc('user_id') // in this case the one with user_id is not null not ordered by name [not sure why]
+//            ->orderByRaw('user_id is null') // this is the correct way
+            ->orderBy('name')
+            ->paginate();
+
+        return view('books', ['books' => $books]);
+    }
 }

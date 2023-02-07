@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $name
  * @property string $author
+ * @property int|null $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
@@ -25,6 +26,11 @@ class Book extends Model
      * @var string
      */
     protected $table = self::TABLE;
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function users()
     {

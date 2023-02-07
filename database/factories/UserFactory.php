@@ -23,6 +23,15 @@ class UserFactory extends Factory
         return [
             'first_name' => $gender ? fake()->firstNameFemale() : fake()->firstNameMale(),
             'last_name' => fake()->lastName(),
+            'town' => rand(0, 10)
+                ? fake()->randomElement([
+                    'Grimsby',
+                    'Jordan',
+                    'Lincoln',
+                    'Smithville',
+                    'Vineland',
+                ])
+                : null,
             'photo' => $photos[array_rand($photos)],
             'gender' => $gender,
             'email' => fake()->unique()->safeEmail(),
