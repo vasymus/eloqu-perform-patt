@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BooksController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\FeaturesController;
 use App\Http\Controllers\PostsController;
@@ -36,3 +37,5 @@ Route::get('/features', [FeaturesController::class, 'index']);
 Route::get('/features/{feature}', [FeaturesController::class, 'show']);
 
 Route::get('/customers', [CustomersController::class, 'index']);
+
+Route::get('/books', [BooksController::class, 'index']);
