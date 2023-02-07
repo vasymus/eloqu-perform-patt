@@ -92,6 +92,7 @@ class UsersController extends Controller
         $users = User::query()
             ->with('company')
             ->when(request('sort') === 'town', function (UserQueryBuilder $query) {
+                /** @see \App\Providers\AppServiceProvider::boot() */
                 $query->orderByNullsLast('town', request('direction'));
 
 //                $query
