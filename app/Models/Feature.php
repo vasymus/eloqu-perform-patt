@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\QueryBuilders\FeatureQueryBuilder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @see \App\Models\Feature::comments()
  * @property \App\Models\Comment[]|\Illuminate\Database\Eloquent\Collection $comments
+ *
+ * @method static \App\Models\QueryBuilders\FeatureQueryBuilder query()
  */
 class Feature extends Model
 {
@@ -28,5 +31,22 @@ class Feature extends Model
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+
+    public function votes()
+    {
+        return $this->hasMany(Vote::class);
+    }
+
+    /**
+     * Create a new Eloquent query builder for the model.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     *
+     * @return \App\Models\QueryBuilders\FeatureQueryBuilder<\App\Models\Feature>
+     */
+    public function newEloquentBuilder($query): FeatureQueryBuilder
+    {
+        return new FeatureQueryBuilder($query);
     }
 }

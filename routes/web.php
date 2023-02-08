@@ -36,6 +36,8 @@ Route::get('/posts', [PostsController::class, 'index']);
 
 Route::get('/features', [FeaturesController::class, 'index']);
 
+Route::get('/features2', [FeaturesController::class, 'index2'])->name('features2');
+
 Route::get('/features/{feature}', [FeaturesController::class, 'show']);
 
 Route::get('/customers', [CustomersController::class, 'index']);

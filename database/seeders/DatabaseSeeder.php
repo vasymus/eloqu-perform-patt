@@ -8,6 +8,7 @@ use App\Models\Comment;
 use App\Models\Company;
 use App\Models\Feature;
 use App\Models\User;
+use App\Models\Vote;
 use Database\Factories\CommentFactory;
 use Database\Factories\CompanyFactory;
 use Database\Factories\CustomerFactory;
@@ -15,6 +16,7 @@ use Database\Factories\FeatureFactory;
 use Database\Factories\LoginFactory;
 use Database\Factories\PostFactory;
 use Database\Factories\UserFactory;
+use Database\Factories\VoteFactory;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -25,6 +27,25 @@ class DatabaseSeeder extends Seeder
      * @return void
      */
     public function run()
+    {
+        $this->seedCompaniesAndUsers();
+
+        $this->seedPosts();
+
+        $this->seedLogins();
+
+        $this->seedCustomers();
+
+        $this->seedFeaturesAndComments();
+
+        $this->seedVotes();
+
+        $this->seedSpecificSeeds();
+
+        $this->seedBooks();
+    }
+
+    protected function seedCompaniesAndUsers()
     {
         // seed companies and users
         CompanyFactory::new()
@@ -37,7 +58,10 @@ class DatabaseSeeder extends Seeder
                         UserFactory::new()->count(10)->make()->map->getAttributes()
                     )
             );
+    }
 
+    protected function seedPosts()
+    {
         // seed posts
         User::query()
             ->inRandomOrder()
@@ -48,7 +72,10 @@ class DatabaseSeeder extends Seeder
                     PostFactory::new()->count(5)->make()->toArray()
                 )
             );
+    }
 
+    protected function seedLogins()
+    {
         // seed logins
         User::query()
             ->inRandomOrder()
@@ -61,7 +88,10 @@ class DatabaseSeeder extends Seeder
                         LoginFactory::new()->count(5)->make()->toArray()
                     )
             );
+    }
 
+    protected function seedCustomers()
+    {
         // seed customers
         User::query()
             ->inRandomOrder()
@@ -74,7 +104,10 @@ class DatabaseSeeder extends Seeder
                         CustomerFactory::new()->count(5)->make()->toArray()
                     )
             );
+    }
 
+    protected function seedFeaturesAndComments()
+    {
         // seed features and comments
         $randomUsers = User::query()->inRandomOrder()->limit(250)->get();
         FeatureFactory::new()->count(60)->create()->each(function(Feature $feature) use($randomUsers) {
@@ -89,7 +122,10 @@ class DatabaseSeeder extends Seeder
                     ->toArray()
             );
         });
+    }
 
+    protected function seedSpecificSeeds()
+    {
         // specific seeds
         /** @var \App\Models\User $user */
         $user = User::query()->find(10000);
@@ -142,8 +178,6 @@ class DatabaseSeeder extends Seeder
                     CustomerFactory::new()->count(25)->make()->toArray()
                 );
         }
-
-        $this->seedBooks();
     }
 
     protected function seedBooks()
@@ -267,5 +301,22 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Code Reviews 101', 'author' => 'Giuliana Carullo', 'user_id' => null],
             ['name' => 'Python Crash Course: A Hands-On, Project-Based Introduction to Programming', 'author' => 'Eric Matthes', 'user_id' => null],
         ]);
+    }
+
+    protected function seedVotes()
+    {
+        $users = User::query()->take(1000)->get();
+        Feature::query()->get()->each(function(Feature $feature) use ($users) {
+            $feature->votes()->createMany(
+                VoteFactory
+                    ::new()
+                    ->count(rand(0, 250))
+                    ->make()
+                    ->each(function(Vote $vote) use ($users) {
+                        $vote->user_id = $users->random()->first()->id;
+                    })
+                    ->toArray()
+            );
+        });
     }
 }

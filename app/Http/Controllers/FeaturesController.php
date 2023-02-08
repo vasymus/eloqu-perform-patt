@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Feature;
+use App\Models\QueryBuilders\FeatureQueryBuilder;
+use Illuminate\Database\Query\Builder;
 
 class FeaturesController extends Controller
 {
@@ -29,6 +31,23 @@ class FeaturesController extends Controller
             'statuses' => $statuses,
             'features' => $features,
         ]);
+    }
+
+    public function index2()
+    {
+        $features = Feature::query()
+            ->withCount('comments', 'votes')
+            ->when(request('sort'), function (FeatureQueryBuilder $query, $sort) {
+                switch ($sort) {
+                    case 'title': return $query->orderBy('title', request('direction'));
+                    case 'status': return $query->orderByStatus(request('direction'));
+                    case 'activity': return $query->orderByActivity(request('direction'));
+                }
+            })
+            ->latest()
+            ->paginate();
+
+        return view('features2', ['features' => $features]);
     }
 
     public function show(Feature $feature)
