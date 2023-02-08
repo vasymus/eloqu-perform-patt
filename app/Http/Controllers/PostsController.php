@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\QueryBuilders\PostQueryBuilder;
 
 class PostsController extends Controller
 {
@@ -16,5 +17,24 @@ class PostsController extends Controller
             ->groupBy(fn ($post) => $post->published_at->year);
 
         return view('posts', ['years' => $years]);
+    }
+
+    public function index2()
+    {
+        $posts = Post::query()
+            ->with('author')
+            ->when(request('search'), function (PostQueryBuilder $query, $search) {
+                $query
+                    ->select('*')
+                    ->addSelectMatchTitleOrBodyAsScore($search)
+                    ->whereMatchTitleOrBody($search)
+//                    ->whereLikeTitleOrBody($search)
+                ;
+            }, function ($query) {
+                $query->latest('published_at');
+            })
+            ->paginate();
+
+        return view('posts2', ['posts' => $posts]);
     }
 }

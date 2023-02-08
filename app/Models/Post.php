@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\QueryBuilders\PostQueryBuilder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -16,6 +17,8 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @see \App\Models\Post::author()
  * @property \App\Models\User $author
+ *
+ * @method static \App\Models\QueryBuilders\PostQueryBuilder query()
  */
 class Post extends Model
 {
@@ -40,5 +43,17 @@ class Post extends Model
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id');
+    }
+
+    /**
+     * Create a new Eloquent query builder for the model.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     *
+     * @return \App\Models\QueryBuilders\PostQueryBuilder<\App\Models\Post>
+     */
+    public function newEloquentBuilder($query): PostQueryBuilder
+    {
+        return new PostQueryBuilder($query);
     }
 }
