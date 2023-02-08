@@ -149,6 +149,8 @@ class UserQueryBuilder extends Builder
 
     public function whereBirthdayThisWeek()
     {
+//         Carbon::setTestNow(Carbon::parse('January 1, 2020'));
+
         $dates = Carbon::now()
             ->startOfWeek()
             ->daysUntil(Carbon::now()->endOfWeek())
