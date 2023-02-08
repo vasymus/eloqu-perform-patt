@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BooksController;
 use App\Http\Controllers\CustomersController;
+use App\Http\Controllers\DevicesController;
 use App\Http\Controllers\FeaturesController;
 use App\Http\Controllers\PostsController;
 use App\Http\Controllers\UsersController;
@@ -47,3 +48,5 @@ Route::get('/customers', [CustomersController::class, 'index']);
 Route::get('/books', [BooksController::class, 'index']);
 
 Route::get('/books2', [BooksController::class, 'index2']);
+
+Route::get('/devices', [DevicesController::class, 'index']);
