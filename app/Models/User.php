@@ -17,6 +17,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string|null $first_name_normalized
  * @property string $last_name
  * @property string|null $last_name_normalized
+ * @property \Illuminate\Support\Carbon|null $birth_date
  * @property string|null $town
  * @property int|null $gender
  * @property string|null $photo
@@ -98,6 +99,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'is_owner' => 'boolean',
+        'birth_date' => 'date',
     ];
 
     public function getNameAttribute(): string

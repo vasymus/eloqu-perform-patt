@@ -32,6 +32,8 @@ Route::get('/users4', [UsersController::class, 'index4']);
 
 Route::get('/users5', [UsersController::class, 'index5'])->name('users5');
 
+Route::get('/users6', [UsersController::class, 'index6']);
+
 Route::get('/posts', [PostsController::class, 'index']);
 
 Route::get('/features', [FeaturesController::class, 'index']);

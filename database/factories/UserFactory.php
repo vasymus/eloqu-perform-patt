@@ -32,6 +32,7 @@ class UserFactory extends Factory
                     'Vineland',
                 ])
                 : null,
+            'birth_date' => fake()->dateTimeBetween($startDate = '-50 years', $endDate = '-20 years'),
             'photo' => $photos[array_rand($photos)],
             'gender' => $gender,
             'email' => fake()->unique()->safeEmail(),

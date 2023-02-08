@@ -105,4 +105,16 @@ class UsersController extends Controller
 
         return view('users', ['users' => $users]);
     }
+
+    public function index6()
+    {
+        $users = User::query()
+            ->whereBirthdayThisWeek()
+            ->orderByBirthday()
+            // ->orderByUpcomingBirthdays()
+            ->orderBy('name')
+            ->paginate();
+
+        return view('users', ['users' => $users]);
+    }
 }

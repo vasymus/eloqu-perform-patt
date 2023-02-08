@@ -4,6 +4,7 @@ namespace App\Models\QueryBuilders;
 
 use App\Models\Company;
 use App\Models\Login;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
@@ -126,5 +127,35 @@ class UserQueryBuilder extends Builder
                 ->latest()
                 ->take(1)
         );
+    }
+
+    public function orderByBirthday()
+    {
+        return $this->orderByRaw('date_format(birth_date, "%m-%d")');
+    }
+
+    public function orderByUpcomingBirthdays()
+    {
+        return $this->orderByRaw('
+                case
+                    when (birth_date + interval (year(?) - year(birth_date)) year) >= ?
+                    then (birth_date + interval (year(?) - year(birth_date)) year)
+                    else (birth_date + interval (year(?) - year(birth_date)) + 1 year)
+                end
+            ', [
+            array_fill(0, 4, Carbon::now()->startOfWeek()->toDateString()),
+        ]);
+    }
+
+    public function whereBirthdayThisWeek()
+    {
+        $dates = Carbon::now()
+            ->startOfWeek()
+            ->daysUntil(Carbon::now()->endOfWeek())
+            ->map(fn ($date) => $date->format('m-d'));
+
+        $this->whereRaw('date_format(birth_date, "%m-%d") in (?,?,?,?,?,?,?)', iterator_to_array($dates));
+
+        return $this;
     }
 }
