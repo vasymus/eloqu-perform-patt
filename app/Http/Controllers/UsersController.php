@@ -71,7 +71,6 @@ class UsersController extends Controller
         $users = User::query()
             ->with('company') // without -- n+1 queries
 
-
             // join approach is slower then subquery approach -- see ->orderByLastLogin()
 //            ->select(['users.*'])
 //            ->join('logins', 'logins.user_id', '=', 'users.id')

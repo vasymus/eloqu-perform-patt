@@ -67,7 +67,7 @@ class UserQueryBuilder extends Builder
 //                        $query->where('name', 'like', $term);
 //                    })
 
-//                    ->orWhere('companies.name', 'like', $term) // if has join -- see above
+//                    ->orWhere('companies.name', 'like', $term) // if has join -- see join query above
 
 //                    ->orWhereIn('company_id', function(QueryBuilder $query) use($term) {
 //                        $query
