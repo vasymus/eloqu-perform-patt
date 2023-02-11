@@ -1,0 +1,22 @@
+# size of indexes
+SELECT database_name, table_name, index_name,
+ROUND(stat_value * @@innodb_page_size / 1024 / 1024, 5) size_in_mb
+FROM mysql.innodb_index_stats
+WHERE stat_name = 'size' AND index_name != 'PRIMARY'
+ORDER BY size_in_mb DESC
+
+# size of columns / tables
+SELECT
+    table_name AS `Table`,
+    round(((data_length + index_length) / 1024 / 1024), 8) `Size in MB`
+FROM information_schema.TABLES
+WHERE table_schema = "laravel2"
+    ORDER BY
+  (DATA_LENGTH + INDEX_LENGTH)
+DESC;
+
+
+1 000 000 records of first_name + last_name
+table size ~ 0.0156 mb
+usual index ~ 33.59 mb
+fulltext index using ngram parser ~ 24.56 mb
