@@ -5,6 +5,7 @@ use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\DevicesController;
 use App\Http\Controllers\FeaturesController;
 use App\Http\Controllers\PostsController;
+use App\Http\Controllers\StoresController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,7 +21,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/---test', function() {
-    dd(\Database\Factories\UserFactory::new()->count(5)->make()->toArray());
+    dd(\Illuminate\Support\Str::uuid());
+    \Illuminate\Support\Facades\DB::unprepared('system ls -al');
+    dump(\App\Models\Store::query()->limit(10)->get()->toArray());
 });
 
 Route::get('/', [UsersController::class, 'index']);
@@ -52,3 +55,5 @@ Route::get('/books', [BooksController::class, 'index']);
 Route::get('/books2', [BooksController::class, 'index2']);
 
 Route::get('/devices', [DevicesController::class, 'index']);
+
+Route::get('/stores', [StoresController::class, 'index']);

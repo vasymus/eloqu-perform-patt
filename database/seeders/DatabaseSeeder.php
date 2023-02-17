@@ -9,6 +9,7 @@ use App\Models\Company;
 use App\Models\Device;
 use App\Models\Feature;
 use App\Models\Post;
+use App\Models\Store;
 use App\Models\User;
 use App\Models\Vote;
 use Database\Factories\CommentFactory;
@@ -20,6 +21,8 @@ use Database\Factories\PostFactory;
 use Database\Factories\UserFactory;
 use Database\Factories\VoteFactory;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -47,6 +50,8 @@ class DatabaseSeeder extends Seeder
         $this->seedBooks();
 
         $this->seedDevices();
+
+        $this->seedStores();
     }
 
     protected function seedCompaniesAndUsers()
@@ -1792,5 +1797,21 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Motorola ATRIX TV XT682', 'brand' => 'Motorola', 'resolution' => '480 x 854 pixels (~245 ppi pixel density)'],
             ['name' => 'Motorola MOTOKEY 3-CHIP EX117', 'brand' => 'Motorola', 'resolution' => '220 x 176 pixels (~141 ppi pixel density)'],
         ];
+    }
+
+    protected function seedStores()
+    {
+        $stores = array_map('str_getcsv', file(storage_path('app/seeds/stores.csv')));
+
+        collect($stores)->each(fn ($store) => Store::query()->forceCreate([
+            'address' => $store[0],
+            'city' => $store[1],
+            'state' => $store[2],
+            'postal' => $store[3],
+            'location' => (function () use ($store) {
+                return DB::raw(sprintf('ST_SRID(Point(%s, %s), 4326)', $store[4], $store[5]));
+            })(),
+        ])
+        );
     }
 }
